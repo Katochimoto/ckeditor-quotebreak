@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-	var REG_EMPTY_HTML = /\S/;
+    var REG_EMPTY_HTML = /\S/;
 
     CKEDITOR.plugins.add('quotebreak', {
         modes: { 'wysiwyg': 1 },
@@ -34,25 +34,25 @@
                 return;
             }
 
-			this.fire('saveSnapshot');
+            this.fire('saveSnapshot');
 
-			var block = path.block || path.blockLimit;
-			var lastElement;
-			var prevLastElement;
+            var block = path.block || path.blockLimit;
+            var lastElement;
+            var prevLastElement;
 
-			while (block && !block.equals(path.root)) {
-				lastElement = range.splitElement(block);
-				prevLastElement = lastElement.getPrevious();
-				cleanNode(lastElement.$);
-				block = block.getParent();
-			}
+            while (block && !block.equals(path.root)) {
+                lastElement = range.splitElement(block);
+                prevLastElement = lastElement.getPrevious();
+                cleanNode(lastElement.$);
+                block = block.getParent();
+            }
 
-			// если вообще не было обхода, то lastElement нет
+            // если вообще не было обхода, то lastElement нет
             if (!lastElement) {
                 return;
             }
 
-			var breakHtml = '<br/>';
+            var breakHtml = '<br/>';
             if (this.enterMode === CKEDITOR.ENTER_P) {
                 breakHtml = '<p>&nbsp;</p>';
             } else if (this.enterMode === CKEDITOR.ENTER_DIV) {
@@ -61,35 +61,35 @@
 
             var breakElement = CKEDITOR.dom.element.createFromHtml(breakHtml);
 
-			// lastElement может быть удален при чистке, тогда ставим перенос
-			// после предыдущего блока
-			if (lastElement.getParent()) {
-				breakElement.insertBefore(lastElement);
-			} else {
-				breakElement.insertAfter(prevLastElement);
-			}
+            // lastElement может быть удален при чистке, тогда ставим перенос
+            // после предыдущего блока
+            if (lastElement.getParent()) {
+                breakElement.insertBefore(lastElement);
+            } else {
+                breakElement.insertAfter(prevLastElement);
+            }
 
             var cursorRange = this.createRange();
             cursorRange.moveToPosition(breakElement, CKEDITOR.POSITION_BEFORE_END);
             cursorRange.select();
-			cursorRange.scrollIntoView();
+            cursorRange.scrollIntoView();
 
             event.cancel();
 
-			this.fire('saveSnapshot');
+            this.fire('saveSnapshot');
         }
     });
 
     function cleanNode(node) {
         if (!node || node.nodeType != 1) {
-			return;
-		}
+            return;
+        }
 
-		node.normalize();
+        node.normalize();
 
         var len = node.childNodes.length;
-		var i = i = len - 1;
-		var child;
+        var i = i = len - 1;
+        var child;
 
         for (; i >= 0; i--) {
             child = node.childNodes[ i ];
