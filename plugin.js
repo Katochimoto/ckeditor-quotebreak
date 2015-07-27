@@ -1,17 +1,26 @@
 (function() {
     'use strict';
 
-    function _cleanNode(node) {
-        if (!node || node.nodeType != 1) return;
+	var REG_EMPTY_HTML = /\S/;
+
+    function cleanNode(node) {
+        if (!node || node.nodeType != 1) {
+			return;
+		}
+
+		node.normalize();
 
         var len = node.childNodes.length;
+		var i = i = len - 1;
+		var child;
 
-        for (var i = len - 1; i >= 0; i--) {
-            var child = node.childNodes[i];
+        for (; i >= 0; i--) {
+            child = node.childNodes[ i ];
 
             if (child && child.nodeType == 1) {
-                if (!/\S/.test(child.innerHTML)) {
+                if (!REG_EMPTY_HTML.test(child.innerHTML)) {
                     child.parentNode.removeChild(child);
+
                 } else {
                     break;
                 }
@@ -54,27 +63,40 @@
                 return;
             }
 
-            var lastElement;
+			this.fire('saveSnapshot');
 
-            path.elements.filter(function(element) {
-                return (element.$ !== path.root.$);
-            }).forEach(function(element) {
-                lastElement = range.splitElement(element);
-            });
+			var block = path.block || path.blockLimit;
+			var lastElement;
+			var prevLastElement;
 
+			while (block && !block.equals(path.root)) {
+				lastElement = range.splitElement(block);
+				prevLastElement = lastElement.getPrevious();
+				cleanNode(lastElement.$);
+				block = block.getParent();
+			}
+
+			// если вообще не было обхода, то lastElement нет
             if (!lastElement) {
                 return;
             }
 
-            var breakHtml = '<br/>';
+			var breakHtml = '<br/>';
             if (this.enterMode === CKEDITOR.ENTER_P) {
-                breakHtml = '<p></p>';
+                breakHtml = '<p>&nbsp;</p>';
             } else if (this.enterMode === CKEDITOR.ENTER_DIV) {
                 breakHtml = '<div><br/></div>';
             }
 
             var breakElement = CKEDITOR.dom.element.createFromHtml(breakHtml);
-            breakElement.insertBefore(lastElement);
+
+			// lastElement может быть удален при чистке, тогда ставим перенос
+			// после предыдущего блока
+			if (lastElement.getParent()) {
+				breakElement.insertBefore(lastElement);
+			} else {
+				breakElement.insertAfter(prevLastElement);
+			}
 
             var cursorRange = this.createRange();
             cursorRange.moveToPosition(breakElement, CKEDITOR.POSITION_BEFORE_END);
@@ -83,7 +105,8 @@
             selection.selectRanges([ cursorRange ]);
 
             event.cancel();
-            console.log('>>', path);
+
+			this.fire('saveSnapshot');
         }
     });
 
