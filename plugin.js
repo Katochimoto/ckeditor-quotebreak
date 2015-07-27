@@ -66,7 +66,14 @@
                 return;
             }
 
-            var breakElement = CKEDITOR.dom.element.createFromHtml('<div><br/></div>');
+            var breakHtml = '<br/>';
+            if (this.enterMode === CKEDITOR.ENTER_P) {
+                breakHtml = '<p></p>';
+            } else if (this.enterMode === CKEDITOR.ENTER_DIV) {
+                breakHtml = '<div><br/></div>';
+            }
+
+            var breakElement = CKEDITOR.dom.element.createFromHtml(breakHtml);
             breakElement.insertBefore(lastElement);
 
             var cursorRange = this.createRange();
