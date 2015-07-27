@@ -3,35 +3,6 @@
 
 	var REG_EMPTY_HTML = /\S/;
 
-    function cleanNode(node) {
-        if (!node || node.nodeType != 1) {
-			return;
-		}
-
-		node.normalize();
-
-        var len = node.childNodes.length;
-		var i = i = len - 1;
-		var child;
-
-        for (; i >= 0; i--) {
-            child = node.childNodes[ i ];
-
-            if (child && child.nodeType == 1) {
-                if (!REG_EMPTY_HTML.test(child.innerHTML)) {
-                    child.parentNode.removeChild(child);
-
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if (!node.childNodes.length) {
-            node.parentNode.removeChild(node);
-        }
-    }
-
     CKEDITOR.plugins.add('quotebreak', {
         modes: { 'wysiwyg': 1 },
 
@@ -100,9 +71,8 @@
 
             var cursorRange = this.createRange();
             cursorRange.moveToPosition(breakElement, CKEDITOR.POSITION_BEFORE_END);
-
-            selection.removeAllRanges();
-            selection.selectRanges([ cursorRange ]);
+            cursorRange.select();
+			cursorRange.scrollIntoView();
 
             event.cancel();
 
@@ -110,4 +80,32 @@
         }
     });
 
+    function cleanNode(node) {
+        if (!node || node.nodeType != 1) {
+			return;
+		}
+
+		node.normalize();
+
+        var len = node.childNodes.length;
+		var i = i = len - 1;
+		var child;
+
+        for (; i >= 0; i--) {
+            child = node.childNodes[ i ];
+
+            if (child && child.nodeType == 1) {
+                if (!REG_EMPTY_HTML.test(child.innerHTML)) {
+                    child.parentNode.removeChild(child);
+
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (!node.childNodes.length) {
+            node.parentNode.removeChild(node);
+        }
+    }
 }());
