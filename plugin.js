@@ -42,6 +42,8 @@
 
             while (block && !block.equals(path.root)) {
                 lastElement = range.splitElement(block);
+                // TODO место для оптимизации
+                // предка нужно найти только у последнего узла до выполнения cleanNode
                 prevLastElement = lastElement.getPrevious();
                 cleanNode(lastElement.$);
                 block = block.getParent();
