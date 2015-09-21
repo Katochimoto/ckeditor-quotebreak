@@ -18,6 +18,7 @@
     <script src="../node_modules/lodash/index.js"></script>
     <script src="../node_modules/vow/vow.min.js"></script>
     <script src="../node_modules/ckeditor/dist/ckeditor-full.js"></script>
+    <script>delete CKEDITOR.plugins.registered[ 'quotebreak' ];</script>
     <script src="../plugin.js"></script>
 </head>
 <body>
@@ -34,7 +35,9 @@
         'on': {
             'instanceReady': function() {
                 this.setData(
-                    '<blockquote><blockquote><blockquote>1<br/>2</blockquote></blockquote></blockquote>'
+                    '<blockquote><blockquote><blockquote>' +
+                    '1<br/>2<br/>3<br/>4<br/>5<br/>6' +
+                    '</blockquote></blockquote></blockquote>'
                 );
             }
         }
